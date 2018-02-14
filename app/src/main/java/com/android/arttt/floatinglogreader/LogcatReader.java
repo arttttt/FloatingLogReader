@@ -1,7 +1,7 @@
 package com.android.arttt.floatinglogreader;
 
 import android.text.TextUtils;
-import android.util.Log;;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -15,19 +15,23 @@ import java.util.List;
 
 public class LogcatReader {
 
-    public static void read(Callback callback) {
-        Process process = SU.getSuProcess();
+    private final static String TAG = "FloatingLogReader";
 
-        if (process == null || callback == null)
+    static Process mSuProcess = null;
+
+    public static void read(Callback callback) {
+        mSuProcess = SU.getSuProcess();
+
+        if (mSuProcess == null || callback == null)
             return;
 
-        PrintStream stream = new PrintStream(new BufferedOutputStream(process.getOutputStream()));
+        PrintStream stream = new PrintStream(new BufferedOutputStream(mSuProcess.getOutputStream()));
         List<String> args = new ArrayList<String>(Arrays.asList("logcat", "-v", "tag"));
         stream.println(TextUtils.join(" ", args));
         stream.flush();
         stream.close();
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(mSuProcess.getInputStream()));
 
         String line;
 
@@ -44,7 +48,17 @@ public class LogcatReader {
                 e.printStackTrace();
             }
 
-            process.destroy();
+            mSuProcess.destroy();
+        }
+    }
+
+    public static void close() {
+        if (mSuProcess != null){
+            try {
+                mSuProcess.destroy();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -23,7 +23,7 @@ public class LogService extends Service {
 
     private void updateLog(String log) {
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-        mAdapter.addItem(new LogItem(log));
+        mAdapter.addItem(LogParser.parseMessage(log));
         windowManager.updateViewLayout(root, mWindowsLayoutParams);
     }
 
@@ -81,6 +81,7 @@ public class LogService extends Service {
         super.onDestroy();
 
         mLogReaderAsyncTask.cancel(true);
+        LogcatReader.close();
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
         windowManager.removeViewImmediate(root);
     }
@@ -110,6 +111,5 @@ public class LogService extends Service {
             super.onProgressUpdate(values);
             updateLog(values[0]);
         }
-
     }
 }
