@@ -13,11 +13,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 public class LogService extends Service {
 
+    private final static String TAG = "FloatingLogReader";
+
     private WindowManager.LayoutParams mWindowsLayoutParams;
     View root;
+    LinearLayoutManager mLinearLayoutManager;
     LogAdapter mAdapter;
     LogReaderAsyncTask mLogReaderAsyncTask;
 
@@ -33,13 +37,14 @@ public class LogService extends Service {
 
         final WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
-        mWindowsLayoutParams = new WindowManager.LayoutParams(1536, 600,
+        mWindowsLayoutParams = new WindowManager.LayoutParams(1536, 800,
                 WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT);
 
         root = LayoutInflater.from(this).inflate(R.layout.floating_window, null);
-        root.setOnTouchListener(new VerySimpleGestureDetector(new VerySimpleGestureDetector.OnVerySimpleGestureListener() {
+        final ImageView moveButton = root.findViewById(R.id.moveButton);
+        moveButton.setOnTouchListener(new VerySimpleGestureDetector(new VerySimpleGestureDetector.OnVerySimpleGestureListener() {
             float oldX = 0;
             float oldY = 0;
             int x = 0;
@@ -67,7 +72,8 @@ public class LogService extends Service {
         }));
 
         RecyclerView recyclerView = root.findViewById(R.id.log);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mLinearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(mLinearLayoutManager);
         mAdapter = new LogAdapter();
         recyclerView.setAdapter(mAdapter);
 

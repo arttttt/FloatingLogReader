@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class LogParser {
 
     private final static String TAG = "FloatingLogReader";
-//(\w)/([^(]+)\(\s*(\\d+)): (.*)
+
     private static Pattern mLogPattern = Pattern.compile("(\\w)/([^:]+\\s*): (.*)");
 
     private static int getMessageLevel(char message) {
@@ -34,33 +34,30 @@ public class LogParser {
                 level = Log.ERROR;
                 break;
             }
+            case 'F': {
+                level = 100;
+                break;
+            }
         }
 
         return level;
     }
 
-    private static String getMessageOwner(String message) {
-        int start = message.indexOf(':');
-        String owner = "";
-        if (start != -1)
-            owner = message.substring(0, start).trim();
-
-        return "";
-    }
-
     public static LogItem parseMessage(String message) {
-        String outMessage = "";
-        int level = -1;
+        String outMessage;
+        int level;
 
         Matcher matcher = mLogPattern.matcher(message);
-        String owner = "";
+        String owner;
 
         if (matcher.find()) {
+            level = getMessageLevel(matcher.group(1).charAt(0));
             outMessage = matcher.group(3);
             owner = matcher.group(2);
-            level = getMessageLevel(matcher.group(1).charAt(0));
         } else {
+            level = -1;
             outMessage = message;
+            owner = "";
         }
 
         return new LogItem(level, owner, outMessage);

@@ -56,6 +56,7 @@ public class LogAdapter extends RecyclerView.Adapter<LogAdapter.LogViewHolder> {
                 ownerTextView.setTextColor(Color.CYAN);
                 break;
             }
+            case 100:
             case Log.ERROR: {
                 ownerTextView.setTextColor(Color.RED);
                 break;
